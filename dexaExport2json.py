@@ -66,7 +66,7 @@ def script():
     # Alle patient_id's ophalen die vanaf de betreffende datum zijn gescand
     scans_cursor = conn.cursor()
     scans_cursor.execute(
-        "select distinct PATIENT_KEY from ScanAnalysis where SCAN_DATE >= #" + datetime.strptime(config['from'],
+        "select distinct PATIENT_KEY,SCAN_DATE from ScanAnalysis where SCAN_DATE >= #" + datetime.strptime(config['from'],
                                                                                                  "%Y-%m-%d").strftime(
             "%m/%d/%Y") + "#")
     data = []  # we doorlopen alle patienten die na de betreffende datum zijn gescand en zetten dit in `data`
@@ -79,7 +79,7 @@ def script():
         for row in cursor.fetchall():
             rij = {'naam': row[1], 'gebdat': row[2].strftime("%Y-%m-%d"), 'sexe': row[3], 'lengte': row[4],
                    'gewicht': row[5],
-                   'etniciteit': row[6], 'identifier1': row[7], 'identifier2': row[8]}
+                   'etniciteit': row[6], 'identifier1': row[7], 'identifier2': row[8], 'scandatum': scans[1].strftime("%Y-%m-%d")}
             cursor2 = conn.cursor()
             cursor2.execute(
                 "select Hip.SCANID, NECK_AREA,NECK_BMC,TROCH_AREA, TROCH_BMC, INTER_AREA, INTER_BMC,HTOT_AREA, Hip.HTOT_BMC,Hip.ROI_TYPE,ScanAnalysis.SCAN_DATE,ScanAnalysis.K,ScanAnalysis.D0 from Hip, ScanAnalysis WHERE Hip.SCANID = ScanAnalysis.SCANID and Hip.PATIENT_KEY='" +
@@ -99,7 +99,7 @@ def script():
                     rij['heuplr'] = "R"
                 elif hip[9] == 2:
                     rij['heuplr'] = "L"
-                rij['scandatum'] = hip[10].strftime("%Y-%m-%d")
+
                 rij['heup_k_waarde'] = hip[11]
                 rij['heup_d_waarde'] = hip[12]
             cursor2.execute(
